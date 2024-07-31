@@ -1,0 +1,73 @@
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>1.4.2.Final</version>
+</dependency>
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-processor</artifactId>
+    <version>1.4.2.Final</version>
+    <scope>provided</scope>
+</dependency>
+
+
+
+==================
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
+@Mapper
+public interface UserMapper {
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    UserDTO userDetailToUserDTO(UserDetail userDetail);
+
+    UserDetail userDTOToUserDetail(UserDTO userDTO);
+}
+
+
+==
+UserDetail userDetail = userService.getUserByFirstName(username);
+UserDTO userDTO = UserMapper.INSTANCE.userDetailToUserDTO(userDetail);
+
+
+==
+
+methos2
+
+<dependency>
+    <groupId>org.modelmapper</groupId>
+    <artifactId>modelmapper</artifactId>
+    <version>2.4.4</version>
+</dependency>
+
+
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
+
+@Component
+public class UserConverter {
+    private final ModelMapper modelMapper;
+
+    public UserConverter() {
+        this.modelMapper = new ModelMapper();
+    }
+
+    public UserDTO convertToDto(UserDetail userDetail) {
+        return modelMapper.map(userDetail, UserDTO.class);
+    }
+
+    public UserDetail convertToEntity(UserDTO userDTO) {
+        return modelMapper.map(userDTO, UserDetail.class);
+    }
+}
+-
+@RestController
+public class UserProfileController {
+
+    private final UserConverter userConverter;
+
+    public UserProfileController(UserConverter userConverter) {
+        this.userConverter = userConverter;
+    }
+UserDTO userDTO = userConverter.convertToDto(userDetail);
